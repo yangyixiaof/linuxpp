@@ -2,10 +2,10 @@ package cn.yyx.research.language.JDTManager;
 
 public class ReferenceHint
 {
-	private byte DataType = -1;
-	private byte WayUse = -1;
+	private int DataType = -1;
+	private int WayUse = -1;
 	
-	public ReferenceHint(byte dataType, byte wayUse) {
+	public ReferenceHint(int dataType, int wayUse) {
 		DataType = dataType;
 		WayUse = wayUse;
 	}
@@ -15,16 +15,16 @@ public class ReferenceHint
 		return DataType | WayUse;
 	}
 	
-	public byte getDataType() {
+	public int getDataType() {
 		return DataType;
 	}
-	public void setDataType(byte dataType) {
+	public void setDataType(int dataType) {
 		DataType = dataType;
 	}
-	public byte getWayUse() {
+	public int getWayUse() {
 		return WayUse;
 	}
-	public void setWayUse(byte wayUse) {
+	public void setWayUse(int wayUse) {
 		WayUse = wayUse;
 	}
 }

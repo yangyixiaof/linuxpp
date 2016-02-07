@@ -18,6 +18,7 @@ public class OneScope implements Comparable<OneScope>{
 		ID = iD;
 	}
 	
+	@Override
 	public int compareTo(OneScope o) {
 		return ID.compareTo(o.getID());
 	}

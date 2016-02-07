@@ -4,15 +4,26 @@ import java.util.Iterator;
 
 import cn.yyx.research.language.simplified.JDTManager.JavaCode;
 
-public class OneJavaFileCode implements JavaCode{
+public class OneJavaFileAnonymousClassesCode implements JavaCode{
 	
 	StringBuilder sb = new StringBuilder("");
+	MethodWindow mw = null;
 	
-	public OneJavaFileCode() {
+	public OneJavaFileAnonymousClassesCode() {
+	}
+	
+	public void AddPreDeclrations(MethodWindow mw)
+	{
+		this.mw = mw;
 	}
 	
 	public void AddOneMethodNodeCode(NodeCode nc)
 	{
+		if (mw != null)
+		{
+			sb.append(mw);
+			mw = null;
+		}
 		Iterator<String> itr = nc.GetCodeIterator();
 		while (itr.hasNext())
 		{

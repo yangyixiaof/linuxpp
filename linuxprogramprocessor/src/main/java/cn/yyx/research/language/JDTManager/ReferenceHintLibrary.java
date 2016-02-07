@@ -30,9 +30,24 @@ public class ReferenceHintLibrary {
 		{
 			return null;
 		}
-		byte wayUse = (byte) (overAllType & Mask);
-		byte dataType = (byte) ((overAllType >> MaskLength) & Mask);
-		return new ReferenceHint(dataType, wayUse);
+		int wayUse = (overAllType & Mask);
+		int dataType = ((overAllType >> MaskLength) & Mask);
+		return new ReferenceHint(dataType << MaskLength, wayUse);
+	}
+	
+	public static Integer ChangeHintHighByteToField(Integer overAllType)
+	{
+		if (overAllType == null)
+		{
+			return ReferenceHintLibrary.NoHint;
+		}
+		ReferenceHint hint = ParseReferenceHint(overAllType);
+		if (hint == null)
+		{
+			return ReferenceHintLibrary.NoHint;
+		}
+		hint.setDataType(Field);
+		return hint.GetOverAllHint();
 	}
 	
 }

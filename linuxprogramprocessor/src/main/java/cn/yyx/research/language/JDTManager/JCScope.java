@@ -8,6 +8,7 @@ public class JCScope {
 	
 	// Integer ID = -1;
 	// Integer Level = -1;
+	String description = null;
 	
 	// real data in reverse order.
 	TreeMap<String, LinkedList<String>> dataInOrder = new TreeMap<String, LinkedList<String>>();
@@ -112,7 +113,7 @@ public class JCScope {
 		{
 			if (Character.isLowerCase(data.charAt(0))==true)
 			{
-				System.err.println("Warning data: " + data + " : the type of data is not declared or assigned. The system will exit. This has be improved in the future to get better compatibility.");
+				System.err.println("Warning data: " + data + " : " + description + " : here is JCScope, the type of data is not declared or assigned. The system will exit. This has be improved in the future to get better compatibility.");
 			}
 			return null;
 		}
@@ -121,7 +122,7 @@ public class JCScope {
 		{
 			if (Character.isLowerCase(data.charAt(0))==true)
 			{
-				System.err.println("Warning data: " + data + " : the data is not declared or assigned. The system will exit. This has be improved in the future to get better compatibility.");
+				System.err.println("Warning data: " + data + " : " + description + " : here is JCScope, the data is not declared or assigned. The system will exit. This has be improved in the future to get better compatibility.");
 			}
 			return null;
 		}
@@ -177,6 +178,11 @@ public class JCScope {
 			String type = typeitr.next();
 			PushNewlyAssignedData(key, type);
 		}
+	}
+	
+	public void SetDescription(String description)
+	{
+		this.description = description;
 	}
 	
 }

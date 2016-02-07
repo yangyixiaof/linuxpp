@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import cn.yyx.research.language.Utility.CorpusContentPair;
+import cn.yyx.research.language.simplified.JDTHelper.SimplifiedCodeGenerateASTVisitor;
 
 public class ClassLogicDetailCorpus {
 	
@@ -21,22 +22,9 @@ public class ClassLogicDetailCorpus {
 		Map<String, String> allcodemap = new TreeMap<String, String>();
 		for (Object object : typeDeclarations) {
 			TypeDeclaration clazzNode = (TypeDeclaration) object;
-			
-			//testing
-			//System.out.println("ClassName:"+clazzNode.getName());
-			
-			/*MethodDeclaration[] methods = clazzNode.getMethods();
-			for (MethodDeclaration method : methods) {
-				Block mbody = method.getBody();
-				StringBuilder onemethod = new StringBuilder("");
-				mbody.accept(new ForwardMethodASTVisitor(onemethod));
-				Content.append(onemethod);
-			}*/
-			ForwardMethodPreProcessASTVisitor fmastv = new ForwardMethodPreProcessASTVisitor();
-			ForwardMethodCodeGenerateASTVisitor fmvgastv = new ForwardMethodCodeGenerateASTVisitor(fmastv);
+			SimplifiedCodeGenerateASTVisitor fmastv = new SimplifiedCodeGenerateASTVisitor();
 			clazzNode.accept(fmastv);
-			clazzNode.accept(fmvgastv);
-			Map<String, String> codemap = fmvgastv.GetGeneratedCode();
+			Map<String, String> codemap = fmastv.GetGeneratedCode();
 			Set<String> keys = codemap.keySet();
 			Iterator<String> itr = keys.iterator();
 			while (itr.hasNext())
@@ -51,11 +39,8 @@ public class ClassLogicDetailCorpus {
 			}
 			
 			fmastv = null;
-			fmvgastv = null;
 			codemap = null;
 		}
-		//testing
-		//System.out.println(Contentstr);
 		ArrayList<CorpusContentPair> result = new ArrayList<CorpusContentPair>();
 		Set<String> keys = allcodemap.keySet();
 		Iterator<String> itr = keys.iterator();

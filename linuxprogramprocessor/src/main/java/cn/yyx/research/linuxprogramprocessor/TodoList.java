@@ -16,5 +16,4 @@ public class TodoList {
 	// comphole should be removed at maximum cancellation. Solved.
 	// a mechanism which append some extra type hint is needed.
 	
-	// TODO inner class seems not handled properly.
 }

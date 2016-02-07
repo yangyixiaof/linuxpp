@@ -144,6 +144,12 @@ public class ScopeDataManager {
 			}
 		} else {
 			if (isfielddeclare) {
+				//System.out.println("fielddeclare:data:"+data+";type:"+type+";isfielddeclare:"+isfielddeclare+";isfinal:"+isfinal);
+				if (data.equals("arr"))
+				{
+					new Exception().printStackTrace();
+				}
+				
 				oscope = classstack.peek();
 				CheckTypeNotNull(type);
 				use = fvdp;
@@ -151,6 +157,7 @@ public class ScopeDataManager {
 						mFieldScopeTypeMap);
 			}
 			if (iscommondeclare) {
+				// System.out.println("commondeclare:data:"+data+";type:"+type+";isfielddeclare:"+isfielddeclare+";isfinal:"+isfinal);
 				oscope = classstack.peek();
 				CheckTypeNotNull(type);
 				use = cvdp;
@@ -223,6 +230,10 @@ public class ScopeDataManager {
 	}
 
 	public String GetDataOffsetInfo(String data, boolean isFieldUseOrUpdate, boolean isCommonUseOrUpdate) {
+		/*if (data.equals("arr"))
+		{
+			System.out.println("==================ddfdf==================");
+		}*/
 		DataScopeInfo firstinfo = GetLastClassIdInList(data);
 		if (firstinfo != null) {
 			/*
@@ -246,6 +257,9 @@ public class ScopeDataManager {
 						continue;
 					}
 				}
+				
+				// System.out.println("nowinfo isfield:"+nowinfo.isField()+";isfinal:"+nowinfo.isFinal());
+				
 				use = GetRealUseDataPool(nowinfo);
 				break;
 			}
