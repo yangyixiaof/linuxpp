@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import cn.yyx.research.language.Utility.CorpusContentPair;
 import cn.yyx.research.language.simplified.JDTHelper.SimplifiedCodeGenerateASTVisitor;
@@ -18,10 +18,10 @@ public class ClassLogicDetailCorpus {
 	@SuppressWarnings("unchecked")
 	public static ArrayList<CorpusContentPair> GenerateClassDetailCorpus(CompilationUnit compilationUnit)
 	{
-		List<TypeDeclaration> typeDeclarations = compilationUnit.types();
+		List<ASTNode> typeDeclarations = compilationUnit.types();
 		Map<String, String> allcodemap = new TreeMap<String, String>();
 		for (Object object : typeDeclarations) {
-			TypeDeclaration clazzNode = (TypeDeclaration) object;
+			ASTNode clazzNode = (ASTNode) object;
 			SimplifiedCodeGenerateASTVisitor fmastv = new SimplifiedCodeGenerateASTVisitor();
 			clazzNode.accept(fmastv);
 			Map<String, String> codemap = fmastv.GetGeneratedCode();
