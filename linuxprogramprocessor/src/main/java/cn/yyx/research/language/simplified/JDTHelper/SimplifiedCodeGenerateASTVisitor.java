@@ -1414,7 +1414,10 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 				cat = "";
 			}
 			cnt += node.getName().toString() + cat;
-			node = (QualifiedName) node.getQualifier();
+			if (len > 0)
+			{
+				node = (QualifiedName) node.getQualifier();
+			}
 		}
 		return cnt;
 	}
