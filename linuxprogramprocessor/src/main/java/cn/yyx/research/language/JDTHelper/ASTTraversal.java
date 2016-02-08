@@ -1,7 +1,9 @@
 package cn.yyx.research.language.JDTHelper;
 
 import java.util.ArrayList;
+import java.util.Map;
 
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -24,11 +26,15 @@ public class ASTTraversal {
 		compilationUnit = parseSourceCode(identifier, document);
 	}
 
+	@SuppressWarnings("unchecked")
 	private CompilationUnit parseSourceCode(String identifier, IDocument pdocument) {
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
 		parser.setSource(pdocument.get().toCharArray());
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setUnitName(identifier);
+		Map<String, String> options = JavaCore.getOptions();
+		options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_8); //or newer version
+		parser.setCompilerOptions(options);
 		CompilationUnit compilationUnit = (CompilationUnit) parser.createAST(null);
 		return compilationUnit;
 	}

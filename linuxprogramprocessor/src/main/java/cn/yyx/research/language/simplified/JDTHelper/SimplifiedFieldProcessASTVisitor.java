@@ -1,6 +1,7 @@
 package cn.yyx.research.language.simplified.JDTHelper;
 
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -60,6 +61,15 @@ public class SimplifiedFieldProcessASTVisitor extends SimplifiedCodeGenerateASTV
 	}
 	
 	@Override
+	public boolean visit(EnumDeclaration node) {
+		return false;
+	}
+	
+	@Override
+	public void endVisit(EnumDeclaration node) {
+	}
+	
+	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		boolean ifcontinue = HandleCurrentLevelControl(node.hashCode());
 		if (ifcontinue)
@@ -75,6 +85,7 @@ public class SimplifiedFieldProcessASTVisitor extends SimplifiedCodeGenerateASTV
 	
 	@Override
 	public boolean visit(FieldDeclaration node) {
+		// System.out.println("FieldDeclaration:" + node + ";typeclass:" + node.getType().getClass());
 		String typecode = TypeCode(node.getType(), true);
 		SetVeryRecentDeclaredType(typecode);
 		String nodecode = GenerateVariableDeclarationTypeCode(typecode, null);

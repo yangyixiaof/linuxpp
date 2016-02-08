@@ -4,7 +4,9 @@ public class GCodeMetaInfo {
 	
 	public static final String AnonymousClassHintStatement = "HT@";
 	public static final String ClassDeclarationHint = "CD@";
+	public static final String EnumDeclarationHint = "ED@";
 	public static final String MethodDeclarationHint = "MD@";
+	public static final String EnumConstantDeclarationHint = "EMD@";
 	public static final String LabelDeclarationHint = "LD@";
 	public static final String VariableDeclarationHint = "VD@";
 	public static final String LambdaExpressionHint = "LE@";
@@ -21,6 +23,7 @@ public class GCodeMetaInfo {
 	public static final String ReturnHint = "RT@";
 	public static final String SwitchHint = "SW@";
 	public static final String CaseHint = "CS@";
+	public static final String DefaultHint = "DF@";
 	public static final String SynchronizedHint = "SC@";
 	public static final String ThrowStatementHint = "TS@";
 	public static final String CatchHint = "CT@";
@@ -33,7 +36,7 @@ public class GCodeMetaInfo {
 	public static final String QualifiedNameHint = "QN@";
 	public static final String FieldAccessHint = "FA@";
 	public static final String QualifiedHint = "Q@";
-	
+	public static final String Initializer = "IB@";
 	
 	public static final String DescriptionHint = "DH@";
 	

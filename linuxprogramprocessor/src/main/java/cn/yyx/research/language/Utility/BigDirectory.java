@@ -10,7 +10,7 @@ public class BigDirectory {
 	File mBigFileDirectory = null;
 	int nowmax = -1;
 	
-	public static String PrefixDirectory  = "";
+	public static String PrefixDirectory  = "BigDirectory";
 	
 	public static final int OneFileMaxMB = 100;
 
