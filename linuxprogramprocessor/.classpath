@@ -22,9 +22,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" kind="src" path="/gitcrawler"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/ngramstatistics"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/programprocessor"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/test"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/programprocessor"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
