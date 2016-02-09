@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
+import cn.yyx.research.language.Utility.MyLogger;
+
 public class ScopeDataManager {
 
 	// DataScope is reverse order.
@@ -36,14 +38,14 @@ public class ScopeDataManager {
 
 	private void CheckTypeNotNull(String type) {
 		if (type == null) {
-			System.err.println("The type in AddDataNewlyUsed must not be null, serious error. The system will exit.");
+			MyLogger.Error("The type in AddDataNewlyUsed must not be null, serious error. The system will exit.");
 			System.exit(1);
 		}
 	}
 
 	private void CheckTypeMustNull(String type) {
 		if (type != null) {
-			System.err.println("The type in AddDataNewlyUsed must be null, serious error. The system will exit.");
+			MyLogger.Error("The type in AddDataNewlyUsed must be null, serious error. The system will exit.");
 			System.exit(1);
 		}
 	}
@@ -55,7 +57,7 @@ public class ScopeDataManager {
 		LinkedList<DataScopeInfo> list = mDataScopeMap.get(data);
 
 		/*
-		 * if (data.equals("a")) { System.out.println("a's list:" + list + " " +
+		 * if (data.equals("a")) { MyLogger.Info("a's list:" + list + " " +
 		 * (list != null ? list.size() : 0) + " type:" + type); }
 		 */
 
@@ -68,7 +70,7 @@ public class ScopeDataManager {
 
 			/*
 			 * if (type.equals("Map<Integer,String>") && data.equals("a")) {
-			 * System.out.println(
+			 * MyLogger.Info(
 			 * "firstone.getOscope().getID() == oscope.getID():" +
 			 * (firstone.getOscope().getID() == oscope.getID()) +
 			 * "isfinal:"+isfinal + "isfield:" + isfield +
@@ -144,7 +146,7 @@ public class ScopeDataManager {
 			}
 		} else {
 			if (isfielddeclare) {
-				//System.out.println("fielddeclare:data:"+data+";type:"+type+";isfielddeclare:"+isfielddeclare+";isfinal:"+isfinal);
+				//MyLogger.Info("fielddeclare:data:"+data+";type:"+type+";isfielddeclare:"+isfielddeclare+";isfinal:"+isfinal);
 				if (data.equals("arr"))
 				{
 					new Exception().printStackTrace();
@@ -157,7 +159,7 @@ public class ScopeDataManager {
 						mFieldScopeTypeMap);
 			}
 			if (iscommondeclare) {
-				// System.out.println("commondeclare:data:"+data+";type:"+type+";isfielddeclare:"+isfielddeclare+";isfinal:"+isfinal);
+				// MyLogger.Info("commondeclare:data:"+data+";type:"+type+";isfielddeclare:"+isfielddeclare+";isfinal:"+isfinal);
 				oscope = classstack.peek();
 				CheckTypeNotNull(type);
 				use = cvdp;
@@ -194,7 +196,7 @@ public class ScopeDataManager {
 			LinkedList<DataScopeInfo> list = mDataScopeMap.get(data);
 			if (list == null || list.size() == 0) {
 				if (Character.isLowerCase(data.charAt(0)) == true) {
-					System.err.println("Warning Data: " + data + "; Not declared field?");
+					MyLogger.Error("Warning Data: " + data + "; Not declared field?");
 				}
 				// new Exception().printStackTrace();
 				// System.exit(1);
@@ -207,7 +209,7 @@ public class ScopeDataManager {
 				type = dscopeinfo.getType();
 			}
 		}
-		// System.err.println("newly added data: " + data);
+		// MyLogger.Error("newly added data: " + data);
 		use.NewlyAssignedData(oscope, data, type);
 	}
 
@@ -232,12 +234,12 @@ public class ScopeDataManager {
 	public String GetDataOffsetInfo(String data, boolean isFieldUseOrUpdate, boolean isCommonUseOrUpdate) {
 		/*if (data.equals("arr"))
 		{
-			System.out.println("==================ddfdf==================");
+			MyLogger.Info("==================ddfdf==================");
 		}*/
 		DataScopeInfo firstinfo = GetLastClassIdInList(data);
 		if (firstinfo != null) {
 			/*
-			 * if (data.equals("a")) { System.out.println(
+			 * if (data.equals("a")) { MyLogger.Info(
 			 * "Get a:isFieldUseOrUpdate:" + isFieldUseOrUpdate+
 			 * " isCommonUseOrUpdate:"+isCommonUseOrUpdate); }
 			 */
@@ -258,7 +260,7 @@ public class ScopeDataManager {
 					}
 				}
 				
-				// System.out.println("nowinfo isfield:"+nowinfo.isField()+";isfinal:"+nowinfo.isFinal());
+				// MyLogger.Info("nowinfo isfield:"+nowinfo.isField()+";isfinal:"+nowinfo.isFinal());
 				
 				use = GetRealUseDataPool(nowinfo);
 				break;
@@ -267,13 +269,13 @@ public class ScopeDataManager {
 			String type = nowinfo.getType();
 			if (use == null)
 			{
-				System.err.println("Debuging use is null: data is:" +data);
+				MyLogger.Error("Debuging use is null: data is:" +data);
 				return null;
 			}
 			Integer exactoffset = use.GetExactDataOffsetInDataOwnScope(dataScope, data, type);
 			if (exactoffset == null || classstack.getSize() == 0) {
 				if (classstack.getSize() == 0) {
-					System.err.println("What the fuck, data does not have scope? The system will exit.");
+					MyLogger.Error("What the fuck, data does not have scope? The system will exit.");
 					System.exit(1);
 				}
 				return null;
@@ -284,7 +286,7 @@ public class ScopeDataManager {
 					+ GCodeMetaInfo.OffsetSpiliter + OffsetLibrary.GetOffsetDescription(exactoffset);
 		} else {
 			if (Character.isLowerCase(data.charAt(0)) == true) {
-				System.err.println("Warning Data: " + data + "; Not declared field?" + " ;isFieldUseOrUpdate:"
+				MyLogger.Error("Warning Data: " + data + "; Not declared field?" + " ;isFieldUseOrUpdate:"
 						+ isFieldUseOrUpdate + " ;isCommonUseOrUpdate:" + isCommonUseOrUpdate);
 			}
 			// new Exception().printStackTrace();
@@ -405,7 +407,7 @@ public class ScopeDataManager {
 
 	private void CheckOnlyOneSize(Map<OneScope, LinkedList<String>> scopeDataMap) {
 		if (scopeDataMap.size() > 1) {
-			System.err.println("ScopeData size:" + scopeDataMap.size()
+			MyLogger.Error("ScopeData size:" + scopeDataMap.size()
 					+ ". What the fuck, in first level method has two class levels? Serious error, the system will exit.");
 			new Exception().printStackTrace();
 			System.exit(1);

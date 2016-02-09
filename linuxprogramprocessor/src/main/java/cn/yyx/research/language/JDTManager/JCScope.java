@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
+import cn.yyx.research.language.Utility.MyLogger;
+
 public class JCScope {
 	
 	// Integer ID = -1;
@@ -63,16 +65,16 @@ public class JCScope {
 		{
 			/*if (type.equals("int"))
 			{
-				System.out.println("prebegin:now used data:"+data);
-				System.out.println("all num of type int:" + allDataNum.get(type));
+				MyLogger.Info("prebegin:now used data:"+data);
+				MyLogger.Info("all num of type int:" + allDataNum.get(type));
 				Set<String> keys = dataorder.keySet();
 				Iterator<String> itr = keys.iterator();
 				while (itr.hasNext())
 				{
 					String dta = itr.next();
-					System.out.println("data:" + dta + "; order:" + dataorder.get(dta));
+					MyLogger.Info("data:" + dta + "; order:" + dataorder.get(dta));
 				}
-				System.out.println("preend.");
+				MyLogger.Info("preend.");
 			}*/
 			
 			int allnum = allDataNum.get(type);
@@ -91,16 +93,16 @@ public class JCScope {
 			
 			/*if (type.equals("int"))
 			{
-				System.out.println("postbegin:now used data:"+data);
-				System.out.println("all num of type int:" + allDataNum.get(type));
+				MyLogger.Info("postbegin:now used data:"+data);
+				MyLogger.Info("all num of type int:" + allDataNum.get(type));
 				Set<String> keys = dataorder.keySet();
 				Iterator<String> itr2 = keys.iterator();
 				while (itr2.hasNext())
 				{
 					String dta = itr2.next();
-					System.out.println("data:" + dta + "; order:" + dataorder.get(dta));
+					MyLogger.Info("data:" + dta + "; order:" + dataorder.get(dta));
 				}
-				System.out.println("postend.");
+				MyLogger.Info("postend.");
 			}*/
 		}
 		
@@ -113,7 +115,7 @@ public class JCScope {
 		{
 			if (Character.isLowerCase(data.charAt(0))==true)
 			{
-				System.err.println("Warning data: " + data + " : " + description + " : here is JCScope, the type of data is not declared or assigned. The system will exit. This has be improved in the future to get better compatibility.");
+				MyLogger.Error("Warning data: " + data + " : " + description + " : here is JCScope, the type of data is not declared or assigned. The system will exit. This has be improved in the future to get better compatibility.");
 			}
 			return null;
 		}
@@ -122,7 +124,7 @@ public class JCScope {
 		{
 			if (Character.isLowerCase(data.charAt(0))==true)
 			{
-				System.err.println("Warning data: " + data + " : " + description + " : here is JCScope, the data is not declared or assigned. The system will exit. This has be improved in the future to get better compatibility.");
+				MyLogger.Error("Warning data: " + data + " : " + description + " : here is JCScope, the data is not declared or assigned. The system will exit. This has be improved in the future to get better compatibility.");
 			}
 			return null;
 		}
@@ -152,7 +154,7 @@ public class JCScope {
 		}
 		if (error)
 		{
-			System.err.println("The two list must be both null or not null.");
+			MyLogger.Error("The two list must be both null or not null.");
 			System.exit(1);
 		}
 		boolean shouldrun = true;

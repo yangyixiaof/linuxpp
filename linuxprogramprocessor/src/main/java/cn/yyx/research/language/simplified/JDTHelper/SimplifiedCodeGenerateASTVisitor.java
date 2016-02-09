@@ -22,6 +22,7 @@ import cn.yyx.research.language.JDTManager.OtherCodeManager;
 import cn.yyx.research.language.JDTManager.ReferenceHintLibrary;
 import cn.yyx.research.language.JDTManager.ScopeDataManager;
 import cn.yyx.research.language.JDTManager.VarOrObjReferenceManager;
+import cn.yyx.research.language.Utility.MyLogger;
 import cn.yyx.research.language.simplified.JDTManager.JavaCode;
 
 public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
@@ -107,7 +108,25 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(ThisExpression node) {
-		return super.visit(node);
+		int nodehashcode = node.hashCode();
+		if (NodeIsRefered(nodehashcode))
+		{
+			String nodecode = "this";
+			Name name = node.getQualifier();
+			if (name != null)
+			{
+				if (name instanceof SimpleName)
+				{
+					nodecode += "." + name.toString();
+				}
+				else
+				{
+					nodecode += "." + ((QualifiedName)name).getName().toString();
+				}
+			}
+			referedcnt.AddNodeHelp(nodehashcode, nodecode);
+		}
+		return false;
 	}
 	
 	@Override
@@ -221,9 +240,9 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
-		// System.out.println("AnonymousClassDeclaration Begin");
-		// System.out.println(node);
-		// System.out.println("AnonymousClassDeclaration End");
+		// MyLogger.Info("AnonymousClassDeclaration Begin");
+		// MyLogger.Info(node);
+		// MyLogger.Info("AnonymousClassDeclaration End");
 		EnterBlock(node);
 		omcanonystack.push(omc);
 		omc = new NodeCode(argmutiple);
@@ -263,7 +282,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(Initializer node) {
 		// Do nothing now.
-		// System.out.println("Initializer:"+node);
+		// MyLogger.Info("Initializer:"+node);
 		if (isFirstLevelASTNode(node)) {
 			if (omc != null && !omc.IsEmpty()) {
 				PushMethodNodeCodeToJavaFileCode();
@@ -368,7 +387,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(SuperMethodReference node) {
-		// System.out.println("SuperMethodReference:"+node);
+		// MyLogger.Info("SuperMethodReference:"+node);
 		QualifiedPreHandle(node, node.getQualifier());
 		runforbid.AddNodeHelp(node.getName().hashCode(), true);
 		return super.visit(node);
@@ -383,7 +402,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(TypeMethodReference node) {
-		// System.out.println("TypeMethodReference:"+node);
+		// MyLogger.Info("TypeMethodReference:"+node);
 		runforbid.AddNodeHelp(node.getName().hashCode(), true);
 		Type type = node.getType();
 		String nodecode = node.getName().toString() + "::" + TypeCode(type, true);
@@ -517,8 +536,8 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	public boolean visit(ArrayCreation node) {
 		ArrayType type = node.getType();
 		
-		// System.err.println("ArrayType:"+type);
-		// System.err.println("ArrayElementType:"+type.getElementType());
+		// MyLogger.Error("ArrayType:"+type);
+		// MyLogger.Error("ArrayElementType:"+type.getElementType());
 		
 		String typecode = TypeCode(type.getElementType(), true);
 		GenerateOneLine(GCodeMetaInfo.ArrayCreationHint + typecode + "(new)", false, false, false, true, null);
@@ -601,7 +620,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean visit(InfixExpression node) {
-		// System.out.println("InfixExpression:" + node);
+		// MyLogger.Info("InfixExpression:" + node);
 		int nodehashcode = node.hashCode();
 		String operatorcode = node.getOperator().toString();
 		Integer hint = referhint.GetNodeHelp(nodehashcode);
@@ -610,7 +629,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 		
 		if (hint == null)
 		{
-			System.err.println("No hint InfixExpression:" + node);
+			MyLogger.Error("No hint InfixExpression:" + node);
 		}
 		
 		ExpressionReferPreHandle(left, hint);
@@ -621,7 +640,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 				ExpressionReferPostHandle(node, left, operatorcode, GCodeMetaInfo.InfixExpressionHint, "", true, false, true, true, false);
 				
 				// String lastomc = omc.GetLastCode();
-				// System.out.println("Last code of OMC Node Code:" + lastomc);
+				// MyLogger.Info("Last code of OMC Node Code:" + lastomc);
 				
 				ExpressionReferPreHandle(right, hint);
 			}
@@ -649,7 +668,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 		List<Expression> extendops = node.extendedOperands();
 		if (extendops == null || extendops.size() == 0)
 		{
-			// System.out.println("infix node:" + node);
+			// MyLogger.Info("infix node:" + node);
 			ExpressionReferPostHandle(node, right, "", "", "", false, false, false, false, false);
 		}
 		else
@@ -930,7 +949,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean visit(SingleVariableDeclaration node) {		
-		// System.out.println("SingleVariableDeclaration:" + node);
+		// MyLogger.Info("SingleVariableDeclaration:" + node);
 		int namehashcode = node.getName().hashCode();
 		runpermit.AddNodeHelp(namehashcode, true);
 		Boolean forbid = runforbid.GetNodeHelp(node.hashCode());
@@ -978,8 +997,8 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(VariableDeclarationStatement node) {
-		// System.err.println("VariableDeclarationStatement:"+node);
-		// System.err.println("VariableDeclarationStatementType:"+node.getType());
+		// MyLogger.Error("VariableDeclarationStatement:"+node);
+		// MyLogger.Error("VariableDeclarationStatementType:"+node.getType());
 		String typecode = TypeCode(node.getType(), true);
 		SetVeryRecentDeclaredType(node.getType().toString());
 		String nodecode = GenerateVariableDeclarationTypeCode(typecode, null);
@@ -1046,9 +1065,9 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(FieldAccess node) {
-		// System.out.println("FieldAccess:"+node);
-		// System.out.println("FieldAccessName:"+node.getName());
-		// System.out.println("FieldAccessExpr:"+node.getExpression());
+		// MyLogger.Info("FieldAccess:"+node);
+		// MyLogger.Info("FieldAccessName:"+node.getName());
+		// MyLogger.Info("FieldAccessExpr:"+node.getExpression());
 		int nodehashcode = node.hashCode();
 		Integer hint = referhint.GetNodeHelp(nodehashcode);
 		ASTNode expr = node.getExpression();
@@ -1119,7 +1138,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-		// System.out.println("MethodDeclarationParent:"+node.getParent().hashCode());
+		// MyLogger.Info("MethodDeclarationParent:"+node.getParent().hashCode());
 		if (isFirstLevelASTNode(node) || ParentIsTypeDeclaration(node)) {
 			if (omc != null) {
 				FlushCode();
@@ -1176,8 +1195,8 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public boolean visit(ClassInstanceCreation node) {
-		// System.out.println("Node Type:"+node.getType());
-		// System.out.println("Body:"+node.getAnonymousClassDeclaration());
+		// MyLogger.Info("Node Type:"+node.getType());
+		// MyLogger.Info("Body:"+node.getAnonymousClassDeclaration());
 		MethodPushReferRequest(node.getExpression(), node.arguments());
 		return super.visit(node);
 	}
@@ -1185,8 +1204,8 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void endVisit(ClassInstanceCreation node) {
-		// System.out.println("Node Type:"+node.getType());
-		// System.out.println("Body:"+node.getAnonymousClassDeclaration());
+		// MyLogger.Info("Node Type:"+node.getType());
+		// MyLogger.Info("Body:"+node.getAnonymousClassDeclaration());
 		Expression expr = node.getExpression();
 		String invoker = "new";
 		if (expr != null)
@@ -1217,7 +1236,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@SuppressWarnings("unchecked")
 	public void endVisit(ConstructorInvocation node) {
 		// Do nothing now.
-		// System.out.println("ConstructorInvocation:" + node);
+		// MyLogger.Info("ConstructorInvocation:" + node);
 		MethodInvocationCode("this", "this", node.arguments());
 		MethodDeleteReferRequest(null, node.arguments());
 	}
@@ -1294,7 +1313,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void endVisit(MethodInvocation node) {
-		// System.out.println("MethodInvocation:" + node);
+		// MyLogger.Info("MethodInvocation:" + node);
 		Expression expr = node.getExpression();
 		String invoker = "this";
 		if (expr != null)
@@ -1320,9 +1339,9 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	
 	@Override
 	public boolean visit(SuperFieldAccess node) {
-		// System.out.println("SuperFieldAccess:" + node);
-		// System.out.println("SuperFieldAccess Qualifier:" +
-		// System.out.println("SuperFieldAccess Name:" + node.getName());
+		// MyLogger.Info("SuperFieldAccess:" + node);
+		// MyLogger.Info("SuperFieldAccess Qualifier:" +
+		// MyLogger.Info("SuperFieldAccess Name:" + node.getName());
 		runforbid.AddNodeHelp(node.getName().hashCode(), true);
 		Name qualifier = node.getQualifier();
 		return QualifiedPreHandle(node, qualifier) && super.visit(node);
@@ -1449,9 +1468,9 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	protected void QualifiedPostHandle(ASTNode node, Name qualifier, Name name, String additional, String additionalprefixoperator)
 	{
 		
-		// System.out.println("node:" + node);
-		// System.out.println("qualifier:" + qualifier);
-		// System.out.println("node is refered:" + NodeIsRefered(node.hashCode()));
+		// MyLogger.Info("node:" + node);
+		// MyLogger.Info("qualifier:" + qualifier);
+		// MyLogger.Info("node is refered:" + NodeIsRefered(node.hashCode()));
 		
 		int nodehashcode = node.hashCode();
 		Boolean forbid = runforbid.GetNodeHelp(nodehashcode);
@@ -1506,15 +1525,15 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 		
 		Integer hint = referhint.GetNodeHelp(node.hashCode());
 		
-		// System.out.println("hint:"+hint);
-		// System.out.println("SimpleNameParent:"+node.getParent());
-		// System.out.println("SimpleNameParentType:"+node.getParent().getClass());
+		// MyLogger.Info("hint:"+hint);
+		// MyLogger.Info("SimpleNameParent:"+node.getParent());
+		// MyLogger.Info("SimpleNameParentType:"+node.getParent().getClass());
 		
 		if (hint == null)
 		{
-			System.err.println("SimpleName:"+node);
+			MyLogger.Error("SimpleName:"+node);
 		}
-		// System.out.println("name:" + node.toString() +";hint:" + (hint == ReferenceHintLibrary.DataDeclare)+";hint2:"+(hint == ReferenceHintLibrary.DataUse));
+		// MyLogger.Info("name:" + node.toString() +";hint:" + (hint == ReferenceHintLibrary.DataDeclare)+";hint2:"+(hint == ReferenceHintLibrary.DataUse));
 		
 		boolean isfield = false;
 		String result = null;
@@ -1525,21 +1544,21 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 			switch (hint) {
 			case ReferenceHintLibrary.DataUse:
 				/*
-				 * if (data.equals("a")) { System.out.println("DataUse"); }
+				 * if (data.equals("a")) { MyLogger.Info("DataUse"); }
 				 */
-				 // System.out.println("datause:"+data);
+				 // MyLogger.Info("datause:"+data);
 				code = GetDataOffset(data, false, false);
 				break;
 			case ReferenceHintLibrary.FieldUse:
 				/*
-				 * if (data.equals("a")) { System.out.println("FieldUse"); }
+				 * if (data.equals("a")) { MyLogger.Info("FieldUse"); }
 				 */
 				isfield = true;
 				code = GetDataOffset(data, true, false);
 				break;
 			case ReferenceHintLibrary.DataUpdate:
 				/*
-				 * if (data.equals("a")) { System.out.println("DataUpdate");
+				 * if (data.equals("a")) { MyLogger.Info("DataUpdate");
 				 * }
 				 */
 				code = GetDataOffset(data, false, false);
@@ -1548,7 +1567,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 			case ReferenceHintLibrary.FieldUpdate:
 				/*
 				 * if (data.equals("a")) {
-				 * System.out.println("FieldUpdate"); }
+				 * MyLogger.Info("FieldUpdate"); }
 				 */
 				isfield = true;
 				code = GetDataOffset(data, true, false);
@@ -1557,14 +1576,14 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 			case ReferenceHintLibrary.DataDeclare:
 				/*
 				 * if (data.equals("a")) {
-				 * System.out.println("DataDeclare"); }
+				 * MyLogger.Info("DataDeclare"); }
 				 */
 				String declaredtype = GetVeryRecentDeclaredType();
-				// System.out.println("common declaredtype:" + declaredtype
+				// MyLogger.Info("common declaredtype:" + declaredtype
 				// + "; and data is:" + data + "; and is final:" +
 				// GetVeryRecentDeclaredFinal());
 				CheckVeryRecentDeclaredTypeMustNotNull(declaredtype);
-				// System.err.println("data is:" + data + "
+				// MyLogger.Error("data is:" + data + "
 				// declaredtype:"+declaredtype);
 				DataNewlyUsed(data, declaredtype, false, false, true, false, false);
 				hasCorrespond = true;
@@ -1572,7 +1591,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 			case ReferenceHintLibrary.FieldDeclare:
 				/*
 				 * if (data.equals("a")) {
-				 * System.out.println("FieldDeclare"); }
+				 * MyLogger.Info("FieldDeclare"); }
 				 */
 				isfield = true;
 				String declaredtype2 = GetVeryRecentDeclaredType();
@@ -1590,7 +1609,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 					String nodestr = node.toString();
 					String pre = (isfield ? "this." : "");
 					if (Character.isLowerCase(nodestr.charAt(0)) == true) {
-						System.err.println("Debugging Data: " + node
+						MyLogger.Error("Debugging Data: " + node
 								+ "; No corresponding data offset. Maybe data use or others.");
 					}
 					result = pre + nodestr;
@@ -1599,7 +1618,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 		} else {
 			String nodestr = node.toString();
 			if (Character.isLowerCase(nodestr.charAt(0)) == true) {
-				System.err.println("Warning Data: " + node
+				MyLogger.Error("Warning Data: " + node
 						+ "; just for debugging and testing. The simple name does not have hint.");
 			}
 			result = nodestr;
@@ -1613,7 +1632,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 			}
 			else
 			{
-				System.err.println("What the fuck. How serious the error is!");
+				MyLogger.Error("What the fuck. How serious the error is!");
 				new Exception().printStackTrace();
 				System.exit(1);
 			}
@@ -1732,7 +1751,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(IntersectionType node) {
 		// type & type
-		// System.out.println("IntersectionType:" + node);
+		// MyLogger.Info("IntersectionType:" + node);
 		// do nothing.
 		return super.visit(node);
 	}
@@ -1740,56 +1759,56 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(UnionType node) {
 		// type | type
-		// System.out.println("UnionType:" + node);
+		// MyLogger.Info("UnionType:" + node);
 		// do nothing.
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(PrimitiveType node) {
-		// System.out.println("PrimitiveType:" + node);
+		// MyLogger.Info("PrimitiveType:" + node);
 		// do nothing. but this is different.
 		return false;
 	}
 
 	@Override
 	public boolean visit(WildcardType node) {
-		// System.out.println("WildcardType:" + node);
+		// MyLogger.Info("WildcardType:" + node);
 		// do nothing.
 		return false;
 	};
 
 	@Override
 	public boolean visit(SimpleType node) {
-		// System.out.println("SimpleType:" + node);
+		// MyLogger.Info("SimpleType:" + node);
 		// do nothing.
 		return false;
 	}
 
 	@Override
 	public boolean visit(QualifiedType node) {
-		// System.out.println("QualifiedType:"+node);
+		// MyLogger.Info("QualifiedType:"+node);
 		// do nothing.
 		return false;
 	}
 
 	@Override
 	public boolean visit(ArrayType node) {
-		// System.out.println("ArrayType:"+node);
+		// MyLogger.Info("ArrayType:"+node);
 		// do nothing.
 		return false;
 	}
 
 	@Override
 	public boolean visit(ParameterizedType node) {
-		// System.out.println("ParameterizedType:"+node);
+		// MyLogger.Info("ParameterizedType:"+node);
 		// do nothing.
 		return false;
 	}
 
 	@Override
 	public boolean visit(NameQualifiedType node) {
-		// System.out.println("NameQualifiedType:"+node);
+		// MyLogger.Info("NameQualifiedType:"+node);
 		// do nothing.
 		return false;
 	}
@@ -1799,7 +1818,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	@SuppressWarnings("unchecked")
 	public boolean visit(EnumDeclaration node) {
 		// Do nothing now.
-		// System.out.println("EnumDeclaration:"+node);
+		// MyLogger.Info("EnumDeclaration:"+node);
 		AppendOtherCode(GCodeMetaInfo.EnumCorpus, node.getName().toString());
 		FlushCode();
 		if (FirstLevelClass == null) {
@@ -1881,7 +1900,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(StringLiteral node) {
-		// System.out.println("StringLiteral:"+node);
+		// MyLogger.Info("StringLiteral:"+node);
 		String literal = node.toString().trim();
 		AppendOtherCode(GCodeMetaInfo.StringCorpus, literal.substring(1, literal.length() - 1));
 		RawLiteralHandle(node, GCodeMetaInfo.StringHolder);
@@ -1890,7 +1909,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(NumberLiteral node) {
-		// System.out.println("NumberLiteral:"+node);
+		// MyLogger.Info("NumberLiteral:"+node);
 		AppendOtherCode(GCodeMetaInfo.NumberCorpus, node.toString());
 		
 		RawLiteralHandle(node, null);
@@ -1899,7 +1918,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(CharacterLiteral node) {
-		// System.out.println("CharacterLiteral:"+node);
+		// MyLogger.Info("CharacterLiteral:"+node);
 		AppendOtherCode(GCodeMetaInfo.StringCorpus, node.charValue() + "");
 		AppendOtherCode(GCodeMetaInfo.CharCorpus, node.charValue() + "");
 		
@@ -2029,7 +2048,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 
 	protected void CheckVeryRecentDeclaredTypeMustNotNull(String declaredtype) {
 		if (declaredtype == null) {
-			System.err.println("No Declared Type? The system will exit.");
+			MyLogger.Error("No Declared Type? The system will exit.");
 			new Exception("No Recent Declared Type").printStackTrace();
 			System.exit(1);
 		}
@@ -2100,7 +2119,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 		}
 		/*if (node instanceof PrefixExpression)
 		{
-			System.out.println("nodestr:" + node + ";node expr null?" + (exprcode == null));
+			MyLogger.Info("nodestr:" + node + ";node expr null?" + (exprcode == null));
 		}*/
 		boolean exprused = false;
 		if (exprcode == null)
@@ -2127,7 +2146,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 			}
 		}
 		
-		// System.out.println("nodestr:"+node+";expr:"+expr+";exprcode:"+exprcode+";operator:"+operator);
+		// MyLogger.Info("nodestr:"+node+";expr:"+expr+";exprcode:"+exprcode+";operator:"+operator);
 		
 		String nodecode = "";
 		String splitter = (needaddsplitter ? GCodeMetaInfo.CommonSplitter : "");
@@ -2214,7 +2233,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	{
 		if (hint == null || hint == ReferenceHintLibrary.NoHint)
 		{
-			System.err.println("There is no hint in this node handle. The system will exit.");
+			MyLogger.Error("There is no hint in this node handle. The system will exit.");
 			new Exception("No hint exception").printStackTrace();
 			System.exit(1);
 		}
@@ -2223,7 +2242,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	protected void CheckCode(String code) {
 		if (code == null)
 		{
-			System.err.println("There is no code in this node handle. The system will exit.");
+			MyLogger.Error("There is no code in this node handle. The system will exit.");
 			new Exception("No code exception").printStackTrace();
 			System.exit(1);
 		}
@@ -2290,7 +2309,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	}
 	
 	protected void EnterBlock(ASTNode node) {
-		// System.out.println("Hashcode:"+node.hashCode()+";node:"+node);
+		// MyLogger.Info("Hashcode:"+node.hashCode()+";node:"+node);
 		sdm.EnterBlock(node.hashCode());
 	}
 	
@@ -2436,7 +2455,7 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	protected void MethodInvocationCode(String methodName, String invoker, List<ASTNode> args) {
 		/*if (methodName.equals("getCodeBase"))
 		{
-			System.out.println("==============hahaha==============");
+			MyLogger.Info("==============hahaha==============");
 		}*/
 		StringBuilder nodecode = new StringBuilder("");
 		nodecode.append(GCodeMetaInfo.MethodInvocationHint + methodName);
@@ -2492,8 +2511,8 @@ public class SimplifiedCodeGenerateASTVisitor extends ASTVisitor {
 	
 	
 	protected void ErrorAndStop(String info) {
-		System.err.println(info);
-		System.err.println("The system will exit.");
+		MyLogger.Error(info);
+		MyLogger.Error("The system will exit.");
 		new Exception().printStackTrace();
 		System.exit(1);
 	}
